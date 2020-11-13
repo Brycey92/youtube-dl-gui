@@ -278,8 +278,9 @@ class GeneralTab(TabPanel):
         ('pl_PL', 'Polish'),
         ('pt_BR', 'Portuguese'),
         ('ru_RU', 'Russian'),
-        ('es_ES', 'Spanish'),
         ('zh_CN', 'Simplified Chinese')
+        ('sk_SK', 'Slovak'),
+        ('es_ES', 'Spanish')
     ])
 
     OUTPUT_TEMPLATES = [
