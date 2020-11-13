@@ -248,13 +248,14 @@ class MainFrame(wx.Frame):
 
         #REFACTOR Move to buttons_data
         self._settings_button = self._create_bitmap_button(self._bitmaps["settings"], (30, 30), self._on_settings)
+        self._settings_button.SetLabel("Settings")
 
         self._url_list = self._create_textctrl(wx.TE_MULTILINE | wx.TE_DONTWRAP, self._on_urllist_edit)
 
         self._folder_icon = self._create_static_bitmap(self._bitmaps["folder"], self._on_open_path)
 
         self._path_combobox = ExtComboBox(self._panel, 5, style=wx.CB_READONLY)
-        self._videoformat_combobox = CustomComboBox(self._panel, style=wx.CB_READONLY)
+        self._videoformat_combobox = CustomComboBox(self._panel, style=wx.CB_READONLY, label="Video Format")
 
         self._download_text = self._create_statictext(self.DOWNLOAD_LIST_LABEL)
         self._status_list = ListCtrl(self.STATUSLIST_COLUMNS,
@@ -272,6 +273,7 @@ class MainFrame(wx.Frame):
             if parent == wx.Button:
                 button.SetLabel(label)
             elif parent == wx.BitmapButton:
+                button.SetLabel(label)
                 button.SetToolTip(wx.ToolTip(label))
 
             if name in self._bitmaps:
@@ -789,6 +791,9 @@ class MainFrame(wx.Frame):
 
             textctrl.Bind(wx.EVT_CHAR, win_ctrla_eventhandler)
 
+        # Load url list from file
+        textctrl.AppendText(self.get_url_list_from_file())
+
         return textctrl
 
     def _create_popup(self, text, title, style):
@@ -1070,6 +1075,7 @@ class MainFrame(wx.Frame):
             result = True
 
         if result:
+            self.save_url_list_to_file() # save url list to file
             self.close()
 
     def close(self):
@@ -1090,6 +1096,18 @@ class MainFrame(wx.Frame):
         self.opt_manager.save_to_file()
 
         self.Destroy()
+
+    def save_url_list_to_file(self):
+        with open('url-list.txt', mode="w") as out_file:
+            out_file.writelines(self._url_list.GetValue())
+
+    def get_url_list_from_file(self):
+        with open('url-list.txt', mode='r') as in_file:
+            urls = ""
+            for url in in_file.readlines():
+                urls += url
+
+            return urls
 
 
 class ListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
