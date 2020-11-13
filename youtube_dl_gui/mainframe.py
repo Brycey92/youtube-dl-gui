@@ -791,6 +791,9 @@ class MainFrame(wx.Frame):
 
             textctrl.Bind(wx.EVT_CHAR, win_ctrla_eventhandler)
 
+        # Load url list from file
+        textctrl.AppendText(self.get_url_list_from_file())
+
         return textctrl
 
     def _create_popup(self, text, title, style):
@@ -1072,6 +1075,7 @@ class MainFrame(wx.Frame):
             result = True
 
         if result:
+            self.save_url_list_to_file() # save url list to file
             self.close()
 
     def close(self):
@@ -1092,6 +1096,18 @@ class MainFrame(wx.Frame):
         self.opt_manager.save_to_file()
 
         self.Destroy()
+
+    def save_url_list_to_file(self):
+        with open('url-list.txt', mode="w") as out_file:
+            out_file.writelines(self._url_list.GetValue())
+
+    def get_url_list_from_file(self):
+        with open('url-list.txt', mode='r') as in_file:
+            urls = ""
+            for url in in_file.readlines():
+                urls += url
+
+            return urls
 
 
 class ListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
