@@ -16,8 +16,12 @@ import os
 import sys
 import json
 import math
+import errno
 import locale
 import subprocess
+
+import distutils
+from distutils.spawn import find_executable
 
 try:
     from twodict import TwoWayOrderedDict
@@ -36,6 +40,9 @@ YOUTUBEDL_BIN = 'youtube-dl'
 if os.name == 'nt':
     YOUTUBEDL_BIN += '.exe'
 
+# Prefer system youtube-dl; if it does not exist, fallback to downloading
+# it in downloadmanager.py/_check_youtubedl
+system_youtube_dl = find_executable(YOUTUBEDL_BIN)
 
 FILESIZE_METRICS = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"]
 
@@ -192,6 +199,17 @@ def get_config_path():
 
     return os.path.join(path, __appname__.lower())
 
+
+def check_pers():
+    path = get_config_path()
+    try:
+        with open(path + '/tst.log', 'w') as f:
+            # opened for writing. write to it here
+            return True
+    except IOError as x:
+        if x.errno == errno.EACCES:
+            print('Permissions Denied, check {0}'.format(path))
+            return False
 
 def shutdown_sys(password=None):
     """Shuts down the system.

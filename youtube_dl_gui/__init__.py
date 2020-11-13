@@ -51,6 +51,9 @@ from .utils import (
     get_config_path,
     get_locale_file,
     os_path_exists,
+    check_pers,
+    YOUTUBEDL_BIN,
+    system_youtube_dl,
     YOUTUBEDL_BIN
 )
 
@@ -81,11 +84,22 @@ from .mainframe import MainFrame
 
 def main():
     """The real main. Creates and calls the main app windows. """
-    youtubedl_path = os.path.join(opt_manager.options["youtubedl_path"], YOUTUBEDL_BIN)
+
+    if system_youtube_dl is not None:
+        youtubedl_path = system_youtube_dl
+        print("Found and using system youtube-dl")
+    else:
+        youtubedl_path = os.path.join(opt_manager.options["youtubedl_path"], YOUTUBEDL_BIN)
+
 
     app = wx.App()
+    if not check_pers():
+        wx.MessageBox(_("The path:{0} is not writable".format(config_path)), _("Permissions denied"), wx.OK | wx.ICON_ERROR)
+        return False
+
     frame = MainFrame(opt_manager, log_manager)
     frame.Show()
+
 
     if opt_manager.options["disable_update"] and not os_path_exists(youtubedl_path):
         wx.MessageBox(_("Failed to locate youtube-dl and updates are disabled"), _("Error"), wx.OK | wx.ICON_ERROR)
